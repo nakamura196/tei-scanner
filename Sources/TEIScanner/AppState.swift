@@ -30,6 +30,7 @@ final class AppState {
     var progressText: String = ""
     var lastSavedURL: URL?
     var showSavedToast = false
+    var requestedDetailMode: String?  // "image" | "xml"
 
     var selectedPage: PageEntry? {
         guard let id = selectedPageID else { return pages.first }
@@ -91,8 +92,12 @@ final class AppState {
         for index in pages.indices {
             pages[index].status = .running
             progressText = "OCR \(index + 1)/\(pages.count): \(pages[index].url.lastPathComponent)"
+            let url = pages[index].url
+            let lang = ocrLanguage
             do {
-                let result = try await OCRService.recognize(imageURL: pages[index].url, language: ocrLanguage)
+                let result = try await Task.detached(priority: .userInitiated) {
+                    try OCRService.recognize(imageURL: url, language: lang)
+                }.value
                 pages[index].result = result
                 pages[index].status = .done(lineCount: result.lines.count)
             } catch {

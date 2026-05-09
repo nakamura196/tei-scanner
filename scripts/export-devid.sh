@@ -36,9 +36,15 @@ echo "[2/4] Building .dmg..."
 DMG_SRC="$(mktemp -d -t teiscanner-dmg)"
 ditto "$APP_PATH" "$DMG_SRC/$SCHEME.app"
 ln -s /Applications "$DMG_SRC/Applications"
+ICNS_SRC="$APP_PATH/Contents/Resources/AppIcon.icns"
+HDIUTIL_VOLICON_ARGS=()
+if [[ -f "$ICNS_SRC" ]]; then
+  HDIUTIL_VOLICON_ARGS=(-volicon "$ICNS_SRC")
+fi
 hdiutil create \
   -volname "${APP_NAME}" \
   -srcfolder "$DMG_SRC" \
+  "${HDIUTIL_VOLICON_ARGS[@]}" \
   -ov -format UDZO \
   "$DMG_PATH" >/dev/null
 rm -rf "$DMG_SRC"

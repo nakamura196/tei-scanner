@@ -28,6 +28,7 @@ struct ContentView: View {
         .navigationTitle("TEI Scanner")
         .focusedSceneValue(\.exportTEIAction, state.xmlPreview.isEmpty ? nil : { saveXML() })
         .onDrop(of: [.fileURL], isTargeted: nil, perform: handleDrop)
+        .onAppear { parseLaunchArgs() }
     }
 
     // MARK: - Empty state
@@ -349,6 +350,57 @@ struct ContentView: View {
     }
 
     // MARK: - File operations
+
+    private func parseLaunchArgs() {
+        let args = CommandLine.arguments
+
+        if let i = args.firstIndex(of: "--demo-folder"), i + 1 < args.count {
+            let url = URL(fileURLWithPath: args[i + 1])
+            if FileManager.default.fileExists(atPath: url.path) {
+                state.loadFolder(url)
+            }
+        }
+
+        if let i = args.firstIndex(of: "--show-tab"), i + 1 < args.count {
+            switch args[i + 1] {
+            case "xml": detailMode = .xml
+            case "image": detailMode = .image
+            default: break
+            }
+        }
+
+        if args.contains("--auto-run-ocr") && !state.pages.isEmpty {
+            Task { await state.runOCRAll() }
+        }
+
+        if let i = args.firstIndex(of: "--screenshot"), i + 1 < args.count {
+            let pathArg = args[i + 1]
+            var delay: Double = 1.5
+            if let di = args.firstIndex(of: "--screenshot-delay"), di + 1 < args.count,
+               let d = Double(args[di + 1]) {
+                delay = d
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                captureFrontWindow(toPathArg: pathArg)
+                NSApplication.shared.terminate(nil)
+            }
+        }
+    }
+
+    private func captureFrontWindow(toPathArg pathArg: String) {
+        let visible = NSApplication.shared.windows.filter { $0.isVisible }
+        guard let window = visible.first ?? NSApplication.shared.windows.first,
+              let view = window.contentView,
+              let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return }
+        view.cacheDisplay(in: view.bounds, to: rep)
+        guard let data = rep.representation(using: .png, properties: [:]) else { return }
+
+        if pathArg == "-" {
+            FileHandle.standardOutput.write(data)
+        } else {
+            try? data.write(to: URL(fileURLWithPath: pathArg))
+        }
+    }
 
     private func handleDrop(_ providers: [NSItemProvider]) -> Bool {
         guard let provider = providers.first else { return false }

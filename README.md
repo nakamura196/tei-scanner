@@ -4,6 +4,19 @@
 
 A macOS desktop app that runs Apple Vision OCR over a folder of page images and emits a single TEI/XML document with per-line `<facsimile>` / `<zone>` zones.
 
+## スクリーンショット / Screenshots
+
+| 起動直後 / Empty state | フォルダ読込後 / Folder loaded |
+|---|---|
+| ![Empty state](docs/screenshots/01-empty.png) | ![Folder loaded](docs/screenshots/02-loaded.png) |
+
+| OCR 完了 / OCR done | TEI/XML 表示 / TEI/XML view |
+|---|---|
+| ![OCR done](docs/screenshots/03-ocr-done.png) | ![TEI/XML](docs/screenshots/04-xml.png) |
+
+スクリーンショットは `scripts/capture_screenshots.sh` で自動生成しています。
+Screenshots are generated automatically by `scripts/capture_screenshots.sh`.
+
 ## ダウンロード / Download
 
 [Releases](../../releases) から最新の `.dmg` を取得し、ダブルクリックでマウント → `TEIScanner.app` を `/Applications` にドラッグしてください。

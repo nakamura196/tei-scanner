@@ -49,7 +49,7 @@ enum OCRLanguage: String, CaseIterable, Identifiable {
 }
 
 enum OCRService {
-    static func recognize(imageURL: URL, language: OCRLanguage) async throws -> OCRPageResult {
+    static func recognize(imageURL: URL, language: OCRLanguage) throws -> OCRPageResult {
         guard let nsImage = NSImage(contentsOf: imageURL),
               let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             throw OCRError.cannotLoadImage(imageURL)
