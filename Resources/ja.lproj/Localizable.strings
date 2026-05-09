@@ -1,0 +1,47 @@
+/* Empty state */
+"Drop a folder of page images here" = "ページ画像が入ったフォルダをここにドロップ";
+"or" = "または";
+"Choose Folder…" = "フォルダを選択…";
+"Change Folder…" = "フォルダを変更…";
+"Supports JPG, PNG, TIFF, HEIC, BMP, GIF" = "対応形式: JPG / PNG / TIFF / HEIC / BMP / GIF";
+
+/* Sidebar headers and metadata fields */
+"OCR" = "OCR";
+"Language" = "言語";
+"Metadata" = "メタデータ";
+"Title" = "タイトル";
+"Responsible name" = "担当者";
+"Language (ISO)" = "言語コード (ISO)";
+"Date (YYYY-MM-DD)" = "日付 (YYYY-MM-DD)";
+
+/* Action buttons */
+"Run OCR" = "OCR を実行";
+"Run OCR on %lld pages" = "%lld ページに OCR を実行";
+"Re-run OCR" = "OCR を再実行";
+"Running…" = "処理中…";
+"Export TEI/XML…" = "TEI/XML を書き出し…";
+
+/* Page row status */
+"Pending" = "待機中";
+"%lld lines" = "%lld 行";
+
+/* Detail picker / preview */
+"View" = "表示";
+"Image" = "画像";
+"TEI/XML" = "TEI/XML";
+"No image selected" = "画像が選択されていません";
+"Select a page in the sidebar." = "サイドバーでページを選択してください。";
+"No TEI output yet" = "TEI 出力はまだありません";
+"Run OCR to generate a TEI/XML preview." = "OCR を実行すると TEI/XML プレビューが生成されます。";
+
+/* Save toast */
+"Saved to %@" = "保存先: %@";
+"Show in Finder" = "Finder で表示";
+
+/* Image box view */
+"Fit" = "全体表示";
+"No OCR lines" = "OCR 結果がありません";
+"Run OCR to populate." = "OCR を実行してください。";
+
+/* OCR language picker */
+"Auto-detect" = "自動判別";

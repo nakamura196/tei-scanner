@@ -35,7 +35,7 @@ enum OCRLanguage: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .auto: return "Auto-detect"
+        case .auto: return String(localized: "Auto-detect")
         case .english: return "English"
         case .japanese: return "日本語"
         case .chineseTraditional: return "繁體中文"

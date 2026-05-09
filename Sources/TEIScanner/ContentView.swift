@@ -26,34 +26,6 @@ struct ContentView: View {
             }
         }
         .navigationTitle("TEI Scanner")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    chooseFolder()
-                } label: {
-                    Label(state.pages.isEmpty ? "Choose folder" : "Change folder",
-                          systemImage: "folder")
-                }
-                .keyboardShortcut("o", modifiers: .command)
-            }
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    Task { await state.runOCRAll() }
-                } label: {
-                    Label("Run OCR", systemImage: "text.viewfinder")
-                }
-                .disabled(state.pages.isEmpty || state.isProcessing)
-                .keyboardShortcut(.return, modifiers: .command)
-            }
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    saveXML()
-                } label: {
-                    Label("Export TEI/XML", systemImage: "arrow.down.doc")
-                }
-                .disabled(state.xmlPreview.isEmpty)
-            }
-        }
         .focusedSceneValue(\.exportTEIAction, state.xmlPreview.isEmpty ? nil : { saveXML() })
         .onDrop(of: [.fileURL], isTargeted: nil, perform: handleDrop)
     }
@@ -102,6 +74,8 @@ struct ContentView: View {
 
     private var sidebar: some View {
         VStack(alignment: .leading, spacing: 0) {
+            actionPanel
+            Divider()
             metadataBox
             Divider()
             ScrollViewReader { proxy in
@@ -126,6 +100,76 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    private var actionPanel: some View {
+        VStack(spacing: 8) {
+            Button {
+                chooseFolder()
+            } label: {
+                Label(state.folderURL == nil ? "Choose Folder…" : "Change Folder…",
+                      systemImage: "folder")
+                    .frame(maxWidth: .infinity)
+            }
+            .controlSize(.large)
+            .keyboardShortcut("o", modifiers: .command)
+
+            runOCRButton
+            exportButton
+
+            if state.isProcessing {
+                ProgressView(value: Double(state.doneCount), total: Double(max(state.pages.count, 1))) {
+                    Text(state.progressText).font(.caption).lineLimit(1)
+                }
+                .progressViewStyle(.linear)
+                .padding(.top, 2)
+            }
+        }
+        .padding(10)
+    }
+
+    @ViewBuilder
+    private var runOCRButton: some View {
+        let body = Button {
+            Task { await state.runOCRAll() }
+        } label: {
+            Label(ocrButtonLabel, systemImage: "text.viewfinder")
+                .frame(maxWidth: .infinity)
+        }
+        .controlSize(.large)
+        .disabled(state.pages.isEmpty || state.isProcessing)
+        .keyboardShortcut(.return, modifiers: .command)
+        if state.hasAnyOCRResult {
+            body.buttonStyle(.bordered)
+        } else {
+            body.buttonStyle(.borderedProminent)
+        }
+    }
+
+    @ViewBuilder
+    private var exportButton: some View {
+        let body = Button {
+            saveXML()
+        } label: {
+            Label("Export TEI/XML…", systemImage: "arrow.down.doc")
+                .frame(maxWidth: .infinity)
+        }
+        .controlSize(.large)
+        .disabled(state.xmlPreview.isEmpty)
+        .keyboardShortcut("s", modifiers: .command)
+        if state.hasAnyOCRResult {
+            body.buttonStyle(.borderedProminent)
+        } else {
+            body.buttonStyle(.bordered)
+        }
+    }
+
+    private var ocrButtonLabel: String {
+        if state.isProcessing { return String(localized: "Running…") }
+        if state.pages.isEmpty { return String(localized: "Run OCR") }
+        if state.hasAnyOCRResult { return String(localized: "Re-run OCR") }
+        let n = state.pages.count
+        return String(localized: "Run OCR on \(n) pages")
     }
 
     private var metadataBox: some View {
@@ -255,56 +299,10 @@ struct ContentView: View {
             ImageBoxView(url: page.url,
                          lines: page.result?.lines ?? [],
                          imageSize: page.result?.imageSize)
-                .overlay(alignment: .bottom) { ocrCTAOverlay }
         } else {
             ContentUnavailableView("No image selected",
                                    systemImage: "photo",
                                    description: Text("Select a page in the sidebar."))
-        }
-    }
-
-    @ViewBuilder
-    private var ocrCTAOverlay: some View {
-        if !state.pages.isEmpty && !state.hasAnyOCRResult && !state.isProcessing {
-            HStack(spacing: 14) {
-                Image(systemName: "text.viewfinder").font(.title2)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("\(state.pages.count) page\(state.pages.count == 1 ? "" : "s") ready")
-                        .font(.headline)
-                    Text("Next step: run OCR to extract text.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-                Spacer()
-                Button {
-                    Task { await state.runOCRAll() }
-                } label: {
-                    Label("Run OCR on \(state.pages.count) page\(state.pages.count == 1 ? "" : "s")",
-                          systemImage: "play.fill")
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .keyboardShortcut(.return, modifiers: .command)
-            }
-            .padding(14)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12).stroke(.separator)
-            )
-            .padding(20)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
-        } else if state.isProcessing {
-            HStack(spacing: 12) {
-                ProgressView(value: Double(state.doneCount), total: Double(max(state.pages.count, 1)))
-                    .progressViewStyle(.linear)
-                    .frame(maxWidth: 220)
-                Text("\(state.doneCount)/\(state.pages.count)")
-                    .monospacedDigit().font(.callout)
-                Text(state.progressText)
-                    .font(.caption).foregroundStyle(.secondary).lineLimit(1)
-            }
-            .padding(12)
-            .background(.regularMaterial, in: Capsule())
-            .padding(20)
         }
     }
 
@@ -315,28 +313,12 @@ struct ContentView: View {
                                    systemImage: "doc.text",
                                    description: Text("Run OCR to generate a TEI/XML preview."))
         } else {
-            VStack(spacing: 0) {
-                ScrollView {
-                    Text(state.xmlPreview)
-                        .font(.system(.body, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                }
-                Divider()
-                HStack {
-                    Text("\(state.xmlPreview.count) chars")
-                        .font(.caption).foregroundStyle(.secondary)
-                    Spacer()
-                    Button {
-                        saveXML()
-                    } label: {
-                        Label("Export TEI/XML…", systemImage: "arrow.down.doc")
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .keyboardShortcut("s", modifiers: .command)
-                }
-                .padding(10)
+            ScrollView {
+                Text(state.xmlPreview)
+                    .font(.system(.body, design: .monospaced))
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
             }
         }
     }

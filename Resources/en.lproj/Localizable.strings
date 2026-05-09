@@ -1,0 +1,47 @@
+/* Empty state */
+"Drop a folder of page images here" = "Drop a folder of page images here";
+"or" = "or";
+"Choose Folder…" = "Choose Folder…";
+"Change Folder…" = "Change Folder…";
+"Supports JPG, PNG, TIFF, HEIC, BMP, GIF" = "Supports JPG, PNG, TIFF, HEIC, BMP, GIF";
+
+/* Sidebar headers and metadata fields */
+"OCR" = "OCR";
+"Language" = "Language";
+"Metadata" = "Metadata";
+"Title" = "Title";
+"Responsible name" = "Responsible name";
+"Language (ISO)" = "Language (ISO)";
+"Date (YYYY-MM-DD)" = "Date (YYYY-MM-DD)";
+
+/* Action buttons */
+"Run OCR" = "Run OCR";
+"Run OCR on %lld pages" = "Run OCR on %lld pages";
+"Re-run OCR" = "Re-run OCR";
+"Running…" = "Running…";
+"Export TEI/XML…" = "Export TEI/XML…";
+
+/* Page row status */
+"Pending" = "Pending";
+"%lld lines" = "%lld lines";
+
+/* Detail picker / preview */
+"View" = "View";
+"Image" = "Image";
+"TEI/XML" = "TEI/XML";
+"No image selected" = "No image selected";
+"Select a page in the sidebar." = "Select a page in the sidebar.";
+"No TEI output yet" = "No TEI output yet";
+"Run OCR to generate a TEI/XML preview." = "Run OCR to generate a TEI/XML preview.";
+
+/* Save toast */
+"Saved to %@" = "Saved to %@";
+"Show in Finder" = "Show in Finder";
+
+/* Image box view */
+"Fit" = "Fit";
+"No OCR lines" = "No OCR lines";
+"Run OCR to populate." = "Run OCR to populate.";
+
+/* OCR language picker */
+"Auto-detect" = "Auto-detect";
