@@ -28,10 +28,21 @@ final class AppState {
     var xmlPreview: String = ""
     var isProcessing = false
     var progressText: String = ""
+    var lastSavedURL: URL?
+    var showSavedToast = false
 
     var selectedPage: PageEntry? {
         guard let id = selectedPageID else { return pages.first }
         return pages.first { $0.id == id } ?? pages.first
+    }
+
+    var hasAnyOCRResult: Bool { pages.contains { $0.result != nil } }
+    var doneCount: Int {
+        pages.reduce(0) { acc, p in
+            if case .done = p.status { return acc + 1 }
+            if case .failed = p.status { return acc + 1 }
+            return acc
+        }
     }
 
     func loadFolder(_ url: URL) {
@@ -100,5 +111,11 @@ final class AppState {
 
     func saveXML(to url: URL) throws {
         try xmlPreview.write(to: url, atomically: true, encoding: .utf8)
+        lastSavedURL = url
+        showSavedToast = true
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(4))
+            await MainActor.run { self?.showSavedToast = false }
+        }
     }
 }
