@@ -1,0 +1,52 @@
+name: TEIScanner
+
+options:
+  bundleIdPrefix: com.nakamura
+  deploymentTarget:
+    macOS: "26.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: Q6S8JS6GWV
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    PRODUCT_NAME: TEIScanner
+
+targets:
+  TEIScanner:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/TEIScanner
+    resources:
+      - path: Resources/Assets.xcassets
+        optional: true
+    info:
+      path: Resources/Info.plist
+      properties:
+        CFBundleName: TEIScanner
+        CFBundleDisplayName: TEI Scanner
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.productivity
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        NSHumanReadableCopyright: "© 2026 Satoru Nakamura"
+        NSHighResolutionCapable: true
+    entitlements:
+      path: Resources/TEIScanner.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.files.user-selected.read-write: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nakamura.teiscanner
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: Resources/TEIScanner.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_KEY_NSPrincipalClass: NSApplication

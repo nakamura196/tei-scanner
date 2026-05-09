@@ -1,0 +1,19 @@
+# Secrets
+.env
+
+# SwiftPM
+.build/
+.swiftpm/
+Package.resolved
+
+# Xcode
+*.xcodeproj/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+
+# Build artifacts
+build/
+
+# macOS
+.DS_Store
