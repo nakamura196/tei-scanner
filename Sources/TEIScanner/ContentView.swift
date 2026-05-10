@@ -12,11 +12,24 @@ struct ContentView: View {
     @State private var state = AppState()
     @State private var detailMode: DetailMode = .image
     @State private var isDropTargeted = false
+    @State private var screenshotMode = false
 
     var body: some View {
         Group {
             if state.pages.isEmpty {
                 emptyState
+            } else if screenshotMode {
+                // Flat layout used during automated screenshot capture so that
+                // `bitmapImageRepForCachingDisplay` can render every region
+                // (NavigationSplitView's sidebar uses NSVisualEffectView which
+                // CALayer-backed APIs do not capture).
+                HStack(spacing: 0) {
+                    sidebar
+                        .frame(width: 320)
+                        .background(Color(nsColor: .controlBackgroundColor))
+                    Divider()
+                    detail
+                }
             } else {
                 NavigationSplitView {
                     sidebar.navigationSplitViewColumnWidth(min: 260, ideal: 320)
@@ -189,19 +202,19 @@ struct ContentView: View {
             Text("Metadata").font(.headline)
             TextField("Title", text: Binding(
                 get: { state.meta.title },
-                set: { state.meta.title = $0; state.rebuildPreview() }
+                set: { state.meta.title = $0; state.scheduleRebuild() }
             ))
             TextField("Responsible name", text: Binding(
                 get: { state.meta.responsibleName },
-                set: { state.meta.responsibleName = $0; state.rebuildPreview() }
+                set: { state.meta.responsibleName = $0; state.scheduleRebuild() }
             ))
             TextField("Language (ISO)", text: Binding(
                 get: { state.meta.language },
-                set: { state.meta.language = $0; state.rebuildPreview() }
+                set: { state.meta.language = $0; state.scheduleRebuild() }
             ))
             TextField("Date (YYYY-MM-DD)", text: Binding(
                 get: { state.meta.date },
-                set: { state.meta.date = $0; state.rebuildPreview() }
+                set: { state.meta.date = $0; state.scheduleRebuild() }
             ))
         }
         .textFieldStyle(.roundedBorder)
@@ -314,13 +327,7 @@ struct ContentView: View {
                                    systemImage: "doc.text",
                                    description: Text("Run OCR to generate a TEI/XML preview."))
         } else {
-            ScrollView {
-                Text(state.xmlPreview)
-                    .font(.system(.body, design: .monospaced))
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-            }
+            CodeTextView(text: state.xmlPreview)
         }
     }
 
@@ -380,6 +387,7 @@ struct ContentView: View {
                let d = Double(args[di + 1]) {
                 delay = d
             }
+            screenshotMode = true
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 captureFrontWindow(toPathArg: pathArg)
                 NSApplication.shared.terminate(nil)
@@ -388,13 +396,16 @@ struct ContentView: View {
     }
 
     private func captureFrontWindow(toPathArg pathArg: String) {
+        // Render via Cocoa's bitmap cache. `screenshotMode` swaps the
+        // NavigationSplitView (which uses an NSVisualEffectView sidebar that
+        // does not capture via this API) for a flat HStack so all regions
+        // appear in the bitmap.
         let visible = NSApplication.shared.windows.filter { $0.isVisible }
         guard let window = visible.first ?? NSApplication.shared.windows.first,
               let view = window.contentView,
               let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return }
         view.cacheDisplay(in: view.bounds, to: rep)
         guard let data = rep.representation(using: .png, properties: [:]) else { return }
-
         if pathArg == "-" {
             FileHandle.standardOutput.write(data)
         } else {

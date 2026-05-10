@@ -31,6 +31,7 @@ final class AppState {
     var lastSavedURL: URL?
     var showSavedToast = false
     var requestedDetailMode: String?  // "image" | "xml"
+    private var rebuildDebounceTask: Task<Void, Never>?
 
     var selectedPage: PageEntry? {
         guard let id = selectedPageID else { return pages.first }
@@ -112,6 +113,18 @@ final class AppState {
             return TEIPage(imageURL: page.url, imageSize: r.imageSize, lines: r.lines)
         }
         xmlPreview = TEIBuilder.build(pages: teiPages, meta: meta)
+    }
+
+    /// Coalesce frequent rebuild requests (e.g. per-keystroke metadata edits)
+    /// into one rebuild after 300 ms of quiet, so typing doesn't re-stringify
+    /// every page on every key.
+    func scheduleRebuild(after ms: Int = 300) {
+        rebuildDebounceTask?.cancel()
+        rebuildDebounceTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(ms))
+            guard !Task.isCancelled else { return }
+            await MainActor.run { self?.rebuildPreview() }
+        }
     }
 
     func saveXML(to url: URL) throws {

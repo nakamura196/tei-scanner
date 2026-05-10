@@ -61,6 +61,13 @@ echo "[4/4] Stapling ticket..."
 xcrun stapler staple "$DMG_PATH"
 xcrun stapler staple "$APP_PATH"
 
+# Set the .dmg file's own Finder icon to the app icon, so the file shown
+# in the user's Downloads folder picks up the brand. Skipped silently if
+# `fileicon` (Homebrew) is not installed.
+if command -v fileicon >/dev/null && [[ -f "$ICNS_SRC" ]]; then
+  fileicon set "$DMG_PATH" "$ICNS_SRC" >/dev/null
+fi
+
 echo
 echo "Done."
 echo "  Notarized .dmg: $DMG_PATH"
