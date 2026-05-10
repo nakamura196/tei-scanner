@@ -32,22 +32,28 @@ APP_PATH="$EXPORT_PATH/$SCHEME.app"
 DMG_PATH="$EXPORT_PATH/$SCHEME.dmg"
 [[ -d "$APP_PATH" ]] || { echo "App not exported" >&2; exit 1; }
 
-echo "[2/4] Building .dmg..."
-DMG_SRC="$(mktemp -d -t teiscanner-dmg)"
-ditto "$APP_PATH" "$DMG_SRC/$SCHEME.app"
-ln -s /Applications "$DMG_SRC/Applications"
-# Drop a hidden .VolumeIcon.icns alongside so Finder picks up a custom icon
-# on the mounted volume.
+echo "[2/4] Building .dmg via create-dmg..."
 ICNS_SRC="$APP_PATH/Contents/Resources/AppIcon.icns"
+BG_PNG="$PWD/docs/dmg-background.png"
+rm -f "$DMG_PATH"
+
+CREATE_DMG_ARGS=(
+  --volname "${APP_NAME}"
+  --window-pos 200 120
+  --window-size 600 400
+  --icon-size 120
+  --icon "$SCHEME.app" 150 200
+  --hide-extension "$SCHEME.app"
+  --app-drop-link 450 200
+  --no-internet-enable
+)
 if [[ -f "$ICNS_SRC" ]]; then
-  cp "$ICNS_SRC" "$DMG_SRC/.VolumeIcon.icns"
+  CREATE_DMG_ARGS+=(--volicon "$ICNS_SRC")
 fi
-hdiutil create \
-  -volname "${APP_NAME}" \
-  -srcfolder "$DMG_SRC" \
-  -ov -format UDZO \
-  "$DMG_PATH" >/dev/null
-rm -rf "$DMG_SRC"
+if [[ -f "$BG_PNG" ]]; then
+  CREATE_DMG_ARGS+=(--background "$BG_PNG")
+fi
+create-dmg "${CREATE_DMG_ARGS[@]}" "$DMG_PATH" "$APP_PATH" >/dev/null
 echo "  Built: $DMG_PATH ($(du -h "$DMG_PATH" | cut -f1))"
 
 echo "[3/4] Submitting .dmg to notary service..."
