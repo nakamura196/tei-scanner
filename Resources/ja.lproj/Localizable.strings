@@ -4,6 +4,7 @@
 "Choose Folder…" = "フォルダを選択…";
 "Change Folder…" = "フォルダを変更…";
 "Supports JPG, PNG, TIFF, HEIC, BMP, GIF" = "対応形式: JPG / PNG / TIFF / HEIC / BMP / GIF";
+"Try sample" = "サンプルを試す";
 
 /* Sidebar headers and metadata fields */
 "OCR" = "OCR";

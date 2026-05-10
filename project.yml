@@ -12,8 +12,8 @@ settings:
     DEVELOPMENT_TEAM: Q6S8JS6GWV
     SWIFT_VERSION: "6.0"
     MACOSX_DEPLOYMENT_TARGET: "26.0"
-    MARKETING_VERSION: "0.5.1"
-    CURRENT_PROJECT_VERSION: "6"
+    MARKETING_VERSION: "0.6.0"
+    CURRENT_PROJECT_VERSION: "7"
     PRODUCT_NAME: TEIScanner
 
 targets:
@@ -26,6 +26,11 @@ targets:
         excludes:
           - "Info.plist"
           - "TEIScanner.entitlements"
+          - "TEIScanner-Debug.entitlements"
+          - "SamplePages/**"
+      - path: Resources/SamplePages
+        type: folder
+        buildPhase: resources
     info:
       path: Resources/Info.plist
       properties:

@@ -67,6 +67,17 @@ struct ContentView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .keyboardShortcut("o", modifiers: .command)
+
+                if Bundle.main.url(forResource: "SamplePages", withExtension: nil) != nil {
+                    Button {
+                        loadBundledSample()
+                    } label: {
+                        Label("Try sample", systemImage: "sparkles")
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                }
+
                 Text("Supports JPG, PNG, TIFF, HEIC, BMP, GIF")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -423,6 +434,13 @@ struct ContentView: View {
             Task { @MainActor in state.loadFolder(folder) }
         }
         return true
+    }
+
+    private func loadBundledSample() {
+        guard let url = Bundle.main.url(forResource: "SamplePages", withExtension: nil) else {
+            return
+        }
+        state.loadFolder(url)
     }
 
     private func chooseFolder() {
