@@ -140,6 +140,7 @@ struct ContentView: View {
             .keyboardShortcut("o", modifiers: .command)
 
             runOCRButton
+            exportBundleButton
             exportButton
 
             if state.isProcessing {
@@ -182,6 +183,19 @@ struct ContentView: View {
         .controlSize(.large)
         .disabled(state.xmlPreview.isEmpty)
         .keyboardShortcut("s", modifiers: .command)
+        body.buttonStyle(.bordered)
+    }
+
+    @ViewBuilder
+    private var exportBundleButton: some View {
+        let body = Button {
+            exportBundle()
+        } label: {
+            Label("Export Bundle…", systemImage: "folder.badge.plus")
+                .frame(maxWidth: .infinity)
+        }
+        .controlSize(.large)
+        .disabled(state.xmlPreview.isEmpty)
         if state.hasAnyOCRResult {
             body.buttonStyle(.borderedProminent)
         } else {
@@ -460,6 +474,21 @@ struct ContentView: View {
         panel.nameFieldStringValue = "\(sanitize(state.meta.title)).xml"
         if panel.runModal() == .OK, let url = panel.url {
             do { try state.saveXML(to: url) }
+            catch {
+                let alert = NSAlert(error: error)
+                alert.runModal()
+            }
+        }
+    }
+
+    private func exportBundle() {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = sanitize(state.meta.title)
+        panel.prompt = String(localized: "Export Bundle")
+        panel.message = String(localized: "Choose where to create the bundle folder (tei.xml + images/).")
+        panel.canCreateDirectories = true
+        if panel.runModal() == .OK, let url = panel.url {
+            do { try state.exportBundle(to: url) }
             catch {
                 let alert = NSAlert(error: error)
                 alert.runModal()

@@ -129,6 +129,12 @@ final class AppState {
 
     func saveXML(to url: URL) throws {
         try xmlPreview.write(to: url, atomically: true, encoding: .utf8)
+        markSaved(url)
+    }
+
+    /// Record `url` as the last saved location and flash the "Saved" toast.
+    /// Shared by `saveXML` and the bundle export (see `BundleExport.swift`).
+    func markSaved(_ url: URL) {
         lastSavedURL = url
         showSavedToast = true
         Task { [weak self] in

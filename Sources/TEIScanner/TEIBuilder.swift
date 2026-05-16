@@ -70,7 +70,8 @@ enum TEIBuilder {
             let w = Int(page.imageSize.width.rounded())
             let h = Int(page.imageSize.height.rounded())
             s += "    <surface xml:id=\"\(surfaceID)\" ulx=\"0\" uly=\"0\" lrx=\"\(w)\" lry=\"\(h)\">\n"
-            s += "      <graphic url=\"\(esc(page.imageURL.lastPathComponent))\" width=\"\(w)px\" height=\"\(h)px\"/>\n"
+            let imageName = bundleImageName(index: i, imageURL: page.imageURL)
+            s += "      <graphic url=\"images/\(esc(imageName))\" width=\"\(w)px\" height=\"\(h)px\"/>\n"
             for (j, line) in page.lines.enumerated() {
                 let zoneID = zoneID(pageIndex: i, lineIndex: j)
                 let ulx = Int(line.box.origin.x.rounded())
@@ -108,6 +109,15 @@ enum TEIBuilder {
     // MARK: - helpers
 
     private static func surfaceID(index: Int) -> String { "f\(index + 1)" }
+
+    /// File name for a page image inside the bundle's `images/` folder.
+    /// Keyed to the surface id (`f1`, `f2`, …) so names are predictable and
+    /// free of spaces / non-ASCII characters carried over from the originals.
+    /// `TEIBuilder` and the bundle export must agree on this name.
+    static func bundleImageName(index: Int, imageURL: URL) -> String {
+        let ext = imageURL.pathExtension.isEmpty ? "png" : imageURL.pathExtension.lowercased()
+        return "\(surfaceID(index: index)).\(ext)"
+    }
     private static func zoneID(pageIndex: Int, lineIndex: Int) -> String {
         "f\(pageIndex + 1)_l\(lineIndex + 1)"
     }
