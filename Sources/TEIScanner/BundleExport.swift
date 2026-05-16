@@ -13,10 +13,10 @@ extension AppState {
 
     /// Write a self-contained bundle folder (`tei.xml` + `images/` +
     /// `index.html`) so it can be opened directly in the TEI/IIIF editor
-    /// without an IIIF server or upload. `index.html` is an XSLT-rendered
-    /// verification view for checking the OCR text against the page images.
-    /// Image files are named `f1.<ext>`, `f2.<ext>`, … matching their
-    /// surface id.
+    /// without an IIIF server or upload. `index.html` is a verification view
+    /// that renders `tei.xml` live in the browser (see `BundleViewer`), for
+    /// checking the OCR text against the page images. Image files are named
+    /// `f1.<ext>`, `f2.<ext>`, … matching their surface id.
     func exportBundle(to destDir: URL) throws {
         let fm = FileManager.default
         let teiPages = teiPages()
@@ -36,10 +36,9 @@ extension AppState {
         let xmlURL = destDir.appendingPathComponent("tei.xml")
         try xml.write(to: xmlURL, atomically: true, encoding: .utf8)
 
-        // HTML verification view, rendered from the TEI via a simple XSLT.
-        let html = try TEIHTMLExporter.renderHTML(fromTEI: xml)
+        // index.html renders tei.xml live in the browser (client-side XSLT).
         let htmlURL = destDir.appendingPathComponent("index.html")
-        try html.write(to: htmlURL, atomically: true, encoding: .utf8)
+        try BundleViewer.indexHTML.write(to: htmlURL, atomically: true, encoding: .utf8)
 
         markSaved(xmlURL)
     }
