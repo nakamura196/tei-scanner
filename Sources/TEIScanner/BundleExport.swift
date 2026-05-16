@@ -11,9 +11,11 @@ extension AppState {
         }
     }
 
-    /// Write a self-contained bundle folder (`tei.xml` + `images/`) so it can
-    /// be opened directly in the TEI/IIIF editor without an IIIF server or
-    /// upload. Image files are named `f1.<ext>`, `f2.<ext>`, … matching their
+    /// Write a self-contained bundle folder (`tei.xml` + `images/` +
+    /// `index.html`) so it can be opened directly in the TEI/IIIF editor
+    /// without an IIIF server or upload. `index.html` is an XSLT-rendered
+    /// verification view for checking the OCR text against the page images.
+    /// Image files are named `f1.<ext>`, `f2.<ext>`, … matching their
     /// surface id.
     func exportBundle(to destDir: URL) throws {
         let fm = FileManager.default
@@ -33,6 +35,11 @@ extension AppState {
         let xml = TEIBuilder.build(pages: teiPages, meta: meta)
         let xmlURL = destDir.appendingPathComponent("tei.xml")
         try xml.write(to: xmlURL, atomically: true, encoding: .utf8)
+
+        // HTML verification view, rendered from the TEI via a simple XSLT.
+        let html = try TEIHTMLExporter.renderHTML(fromTEI: xml)
+        let htmlURL = destDir.appendingPathComponent("index.html")
+        try html.write(to: htmlURL, atomically: true, encoding: .utf8)
 
         markSaved(xmlURL)
     }

@@ -485,7 +485,7 @@ struct ContentView: View {
         let panel = NSSavePanel()
         panel.nameFieldStringValue = sanitize(state.meta.title)
         panel.prompt = String(localized: "Export Bundle")
-        panel.message = String(localized: "Choose where to create the bundle folder (tei.xml + images/).")
+        panel.message = String(localized: "Choose where to create the bundle folder (tei.xml + images/ + index.html).")
         panel.canCreateDirectories = true
         if panel.runModal() == .OK, let url = panel.url {
             do { try state.exportBundle(to: url) }
