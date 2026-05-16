@@ -87,17 +87,21 @@ enum TEIBuilder {
 
     // MARK: - text/body
 
+    /// Emits the transcription as `<pb>` / `<lb>` milestones inside a single
+    /// `<p>`. Each line is an `<lb>` whose `corresp` points at its `<zone>`,
+    /// with the OCR text following the milestone. This is the structure the
+    /// TEI/IIIF editor parses (see its `public/samples/sample-tei.xml`).
     private static func textBody(pages: [TEIPage]) -> String {
-        var s = "  <text>\n    <body>\n"
+        var s = "  <text>\n    <body>\n      <p>\n"
         for (i, page) in pages.enumerated() {
             let surfaceID = surfaceID(index: i)
-            s += "      <pb n=\"\(i + 1)\" facs=\"#\(surfaceID)\"/>\n"
+            s += "        <pb n=\"\(i + 1)\" facs=\"#\(surfaceID)\"/>\n"
             for (j, line) in page.lines.enumerated() {
                 let zoneID = zoneID(pageIndex: i, lineIndex: j)
-                s += "      <ab facs=\"#\(zoneID)\">\(esc(line.text))</ab>\n"
+                s += "        <lb corresp=\"#\(zoneID)\" n=\"\(j + 1)\" type=\"line\"/>\(esc(line.text))\n"
             }
         }
-        s += "    </body>\n  </text>\n"
+        s += "      </p>\n    </body>\n  </text>\n"
         return s
     }
 

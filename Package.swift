@@ -8,6 +8,11 @@ let package = Package(
         .executableTarget(
             name: "TEIScanner",
             path: "Sources/TEIScanner"
+        ),
+        .testTarget(
+            name: "TEIScannerTests",
+            dependencies: ["TEIScanner"],
+            path: "Tests/TEIScannerTests"
         )
     ]
 )

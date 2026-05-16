@@ -31,7 +31,7 @@ Get the latest `.dmg` from [Releases](../../releases). Double-click to mount, th
 - フォルダ単位で複数画像を一括 OCR / Batch OCR over a folder of images
 - 認識した行を bbox オーバーレイと連動するテキスト一覧として並列表示 / Side-by-side image preview with bbox overlay and a synced line list
 - 拡大縮小・パン / Zoom and pan in the image preview
-- 1 ページ = 1 `<surface>`、1 行 = 1 `<zone>` + `<ab facs="#…">` の TEI/XML 出力 / TEI/XML output: one `<surface>` per page, one `<zone>` + `<ab>` per line
+- 1 ページ = 1 `<surface>`、1 行 = 1 `<zone>` + `<lb corresp="#…">` の TEI/XML 出力 / TEI/XML output: one `<surface>` per page, one `<zone>` + `<lb>` per line
 - 言語切り替え：自動判別 / English / 日本語 / 中文 / 한국어 / Français / Deutsch / Español / Language picker covering the same set
 - UI ローカライズ：日本語（既定）/ 英語 / Bilingual UI (Japanese default / English)
 
