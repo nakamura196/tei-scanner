@@ -21,6 +21,7 @@
 "Re-run OCR" = "OCR を再実行";
 "Running…" = "処理中…";
 "Export TEI/XML…" = "TEI/XML を書き出し…";
+"Export Bundle…" = "バンドルを書き出し…";
 
 /* Page row status */
 "Pending" = "待機中";
@@ -46,3 +47,7 @@
 
 /* OCR language picker */
 "Auto-detect" = "自動判別";
+
+/* Bundle export panel */
+"Export Bundle" = "バンドルを書き出し";
+"Choose where to create the bundle folder (tei.xml + images/ + index.html)." = "バンドルフォルダ (tei.xml + images/ + index.html) の作成先を選択してください。";

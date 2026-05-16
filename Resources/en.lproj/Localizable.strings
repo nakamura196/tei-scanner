@@ -21,6 +21,7 @@
 "Re-run OCR" = "Re-run OCR";
 "Running…" = "Running…";
 "Export TEI/XML…" = "Export TEI/XML…";
+"Export Bundle…" = "Export Bundle…";
 
 /* Page row status */
 "Pending" = "Pending";
@@ -46,3 +47,7 @@
 
 /* OCR language picker */
 "Auto-detect" = "Auto-detect";
+
+/* Bundle export panel */
+"Export Bundle" = "Export Bundle";
+"Choose where to create the bundle folder (tei.xml + images/ + index.html)." = "Choose where to create the bundle folder (tei.xml + images/ + index.html).";
