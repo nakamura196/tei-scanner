@@ -4,8 +4,8 @@
 #   App Store version exists  ->  metadata  ->  attach build + screenshots
 #   ->  review details  ->  (optionally) submit for review.
 #
-# The version is read from project.yml (MARKETING_VERSION). Bump the
-# version and commit before running this.
+# The version / build numbers are read from project.yml (MARKETING_VERSION
+# and CURRENT_PROJECT_VERSION). Bump them and commit before running this.
 #
 # Prerequisites:
 #   - An "Apple Distribution" certificate + Mac App Store provisioning.
@@ -15,25 +15,43 @@
 #     UI — the API does not cover them.
 #
 # Usage:
-#   scripts/release-appstore.sh            # everything except the final submit
-#   scripts/release-appstore.sh --submit   # also submit the version for review
+#   scripts/release-appstore.sh               # everything except the submit
+#   scripts/release-appstore.sh --submit      # also submit for review
+#   scripts/release-appstore.sh --skip-build  # resume: the build is already
+#                                             #   uploaded, skip archive/upload
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 SUBMIT=""
-[[ "${1:-}" == "--submit" ]] && SUBMIT=1
+SKIP_BUILD=""
+for arg in "$@"; do
+  case "$arg" in
+    --submit) SUBMIT=1 ;;
+    --skip-build) SKIP_BUILD=1 ;;
+    *) echo "unknown argument: $arg" >&2; exit 2 ;;
+  esac
+done
 
 VERSION=$(grep -E '^[[:space:]]*MARKETING_VERSION:' project.yml \
   | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
-[[ -n "$VERSION" ]] || { echo "Could not read MARKETING_VERSION from project.yml" >&2; exit 1; }
+BUILD=$(grep -E '^[[:space:]]*CURRENT_PROJECT_VERSION:' project.yml \
+  | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+[[ -n "$VERSION" && -n "$BUILD" ]] || {
+  echo "Could not read MARKETING_VERSION / CURRENT_PROJECT_VERSION from project.yml" >&2
+  exit 1
+}
 
-echo "App Store release: $VERSION"
+echo "App Store release: $VERSION (build $BUILD)"
 
-echo "[1/6] Archiving + exporting .pkg + uploading to App Store Connect ..."
-scripts/archive.sh --appstore
+if [[ -z "$SKIP_BUILD" ]]; then
+  echo "[1/6] Archiving + exporting .pkg + uploading to App Store Connect ..."
+  scripts/archive.sh --appstore
+else
+  echo "[1/6] Skipping archive/upload (--skip-build) — using the build already on ASC."
+fi
 
-echo "[2/6] Waiting for the uploaded build to finish processing ..."
-python3 scripts/asc_wait_build.py 45
+echo "[2/6] Waiting for build $BUILD to finish processing ..."
+python3 scripts/asc_wait_build.py "$BUILD" 45
 
 echo "[3/6] Ensuring the App Store version $VERSION exists ..."
 python3 scripts/asc_version.py "$VERSION"

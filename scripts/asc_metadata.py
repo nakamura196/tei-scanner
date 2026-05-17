@@ -140,8 +140,19 @@ def get_editable_version_id(app_id):
 
 
 def get_app_info_id(app_id):
+    # Prefer the editable appInfo (tied to the version being prepared);
+    # patching the live/locked appInfo fails with HTTP 409.
     _, data = request("GET", f"apps/{app_id}/appInfos")
-    return data["data"][0]["id"]
+    infos = data.get("data", [])
+    if not infos:
+        raise SystemExit("No appInfo found for the app.")
+    editable = {"PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED",
+                "REJECTED", "METADATA_REJECTED"}
+    for info in infos:
+        attrs = info.get("attributes", {})
+        if attrs.get("state") in editable or attrs.get("appStoreState") in editable:
+            return info["id"]
+    return infos[0]["id"]
 
 
 def upsert_version_localizations(version_id, locales):
@@ -195,7 +206,7 @@ def upsert_info_localizations(app_info_id):
 
 
 def set_categories(app_info_id):
-    request("PATCH", f"appInfos/{app_info_id}", {
+    status, _ = request("PATCH", f"appInfos/{app_info_id}", {
         "data": {
             "type": "appInfos",
             "id": app_info_id,
@@ -208,8 +219,12 @@ def set_categories(app_info_id):
                 },
             },
         }
-    })
-    print(f"  categories: {PRIMARY_CATEGORY} / {SECONDARY_CATEGORY}")
+    }, raise_on_error=False)
+    if status in (200, 204):
+        print(f"  categories: {PRIMARY_CATEGORY} / {SECONDARY_CATEGORY}")
+    else:
+        print(f"  [skip] categories unchanged (HTTP {status}; "
+              f"already set, or appInfo locked)")
 
 
 def set_copyright(version_id):
