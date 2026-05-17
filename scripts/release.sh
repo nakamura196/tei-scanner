@@ -28,8 +28,8 @@ DMG="build/Export/DeveloperID/TEIScanner.dmg"
 
 echo "Release $TAG"
 
-if [[ -n "$(git status --porcelain)" ]]; then
-  echo "Working tree is not clean — commit or stash first." >&2
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+  echo "Working tree has uncommitted changes — commit or stash first." >&2
   exit 1
 fi
 if [[ -z "$DRY_RUN" ]] && git rev-parse "$TAG" >/dev/null 2>&1; then
