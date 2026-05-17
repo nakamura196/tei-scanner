@@ -32,7 +32,7 @@ LOCALIZED = {
             "スキャンしたページ画像のフォルダを Apple Vision の OCR にかけ、"
             "認識した行の位置情報を含む 1 つの TEI/XML ファイルを生成するデスクトップアプリです。\n\n"
             "・フォルダ単位で複数画像を一括処理\n"
-            "・各行の認識テキストとバウンディングボックスを TEI の facsimile / surface / zone / ab 要素として出力\n"
+            "・各行の認識テキストとバウンディングボックスを TEI の facsimile / surface / zone / pb / lb 要素として出力\n"
             "・画像プレビュー上に bbox を重ね、認識結果と原本を一目で比較\n"
             "・言語: 自動判別 / 英語 / 日本語 / 中国語 (簡体・繁体) / 韓国語 / 仏 / 独 / 西\n"
             "・拡大縮小・パン・行リストとの双方向ハイライト\n\n"
@@ -45,6 +45,13 @@ LOCALIZED = {
             "フォルダの画像を一括 OCR、各行のバウンディングボックスを TEI/XML として保存。"
             "デジタル人文学の翻刻作業を始める前のひと手間を肩代わりします。"
         ),
+        "whatsNew": (
+            "・OCR 結果を「バンドル」(tei.xml + images フォルダ + index.html) として"
+            "書き出す機能を追加しました。IIIF サーバを介さず TEI/IIIF エディタに"
+            "直接読み込めます。\n"
+            "・バンドル内の index.html は、ブラウザで tei.xml を表示して OCR テキストと"
+            "ページ画像を照合できる確認用ビューです。"
+        ),
         "supportUrl": SUPPORT_URL,
         "marketingUrl": MARKETING_URL,
     },
@@ -53,7 +60,7 @@ LOCALIZED = {
             "TEI Scanner runs Apple's Vision OCR over a folder of scanned page images "
             "and produces a single TEI/XML file with per-line bounding-box zones.\n\n"
             "- Batch OCR a folder of pages in one click\n"
-            "- Outputs TEI/XML with facsimile / surface / zone / ab elements for each recognised line\n"
+            "- Outputs TEI/XML with facsimile / surface / zone / pb / lb elements for each recognised line\n"
             "- Side-by-side preview with bbox overlay for instant comparison\n"
             "- Languages: auto / English / Japanese / Chinese (Simplified & Traditional) / Korean / French / German / Spanish\n"
             "- Zoom, pan, and synced highlighting between the image and the line list\n\n"
@@ -65,6 +72,14 @@ LOCALIZED = {
         "promotionalText": (
             "Batch OCR a folder of page images. Each line gets a bounding box, "
             "exported as TEI/XML — ready for downstream digital humanities work."
+        ),
+        "whatsNew": (
+            "- Added Export Bundle: save the OCR result as a self-contained "
+            "folder (tei.xml + an images folder + index.html) that opens "
+            "directly in a TEI/IIIF editor — no IIIF server needed.\n"
+            "- The bundle's index.html is a verification view that renders "
+            "tei.xml in the browser, so you can check the OCR text against "
+            "the page images."
         ),
         "supportUrl": SUPPORT_URL,
         "marketingUrl": MARKETING_URL,
