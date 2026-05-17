@@ -51,17 +51,27 @@ For lightweight iteration, `swift run` works as well. Note that localized string
 
 ## 配布 / Release pipeline
 
-```bash
-# Developer ID + notarized .dmg
-scripts/archive.sh --devid
+リリースは `project.yml` の `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` を上げてコミットしてから、以下のスクリプトで実行します。GitHub と Mac App Store でバージョン番号は共通です。
 
-# Mac App Store .pkg
-scripts/archive.sh --appstore
+Bump `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.yml` and commit, then run the scripts below. The GitHub and Mac App Store releases share one version number.
+
+```bash
+# GitHub リリース / GitHub release
+#   アーカイブ → 公証済み .dmg → タグ v<version> → リリース公開
+#   archive → notarized .dmg → tag v<version> → publish the release
+scripts/release.sh
+
+# Mac App Store
+#   アーカイブ → .pkg アップロード → 処理待ち → メタデータ → ビルド添付 → 審査
+#   archive → upload .pkg → wait for processing → metadata → attach build → review
+scripts/release-appstore.sh              # 審査提出の手前まで / stage only, do not submit
+scripts/release-appstore.sh --submit     # 審査提出まで / also submit for review
+scripts/release-appstore.sh --skip-build # ビルドが既にアップロード済みのとき再開 / resume after upload
 ```
 
-`.env` に App Store Connect API キー、Bundle ID、Team ID 等を記載します（`.env.example` 参照）。
+署名・公証には配布証明書（`Developer ID Application` / `Apple Distribution`）が必要です。App Store Connect API キー・Bundle ID・Team ID 等は `.env` に記載します（`.env.example` 参照）。低レベルの構成要素として `scripts/archive.sh --devid` / `--appstore` も利用できます。App Privacy（プライバシー申告）は API 非対応のため、App Store Connect の Web UI で一度だけ設定します。
 
-See `.env.example` for the required environment variables (App Store Connect API key, Bundle ID, Team ID, etc.).
+Signing and notarization need distribution certificates (`Developer ID Application` / `Apple Distribution`). The App Store Connect API key, Bundle ID, Team ID, etc. go in `.env` (see `.env.example`). The lower-level building blocks `scripts/archive.sh --devid` / `--appstore` are still available. App Privacy declarations are not covered by the API — set them once in the App Store Connect web UI.
 
 ## ライセンス / License
 
