@@ -90,9 +90,11 @@ def report_readiness(app_id, version_id):
     print()
     print("Readiness check:")
 
+    # `build` must be listed in the sparse fieldset, or the relationship is
+    # omitted and the "build attached" check below is a false negative.
     _, data = request("GET",
                       f"appStoreVersions/{version_id}?include=build"
-                      f"&fields[appStoreVersions]=copyright,appStoreState,versionString")
+                      f"&fields[appStoreVersions]=copyright,appStoreState,versionString,build")
     a = data["data"]["attributes"]
     print(f"  version {a['versionString']}: state={a['appStoreState']}, "
           f"copyright={'set' if a.get('copyright') else 'MISSING'}")
